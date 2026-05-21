@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: JAM CRITTY event registration API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: registrations
+    description: Registration operations
+  - name: stats
+    description: Stats operations
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
@@ -24,6 +30,321 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /register:
+    post:
+      operationId: register
+      tags: [registrations]
+      summary: Register for the event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationInput"
+      responses:
+        "201":
+          description: Registration created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistrationResult"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get registration stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+  /registrations:
+    get:
+      operationId: getRegistrations
+      tags: [admin]
+      summary: Get all registrations (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of registrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Registration"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /registrations/{id}:
+    patch:
+      operationId: updateRegistration
+      tags: [admin]
+      summary: Update a registration (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationUpdate"
+      responses:
+        "200":
+          description: Updated registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteRegistration
+      tags: [admin]
+      summary: Delete a registration (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /tickets/lookup:
+    post:
+      operationId: lookupTicket
+      tags: [admin]
+      summary: Look up a ticket by token (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketLookupInput"
+      responses:
+        "200":
+          description: Registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /checkin:
+    post:
+      operationId: checkin
+      tags: [admin]
+      summary: Check in a registrant (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckinInput"
+      responses:
+        "200":
+          description: Updated registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Already checked in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /walkup:
+    post:
+      operationId: walkup
+      tags: [admin]
+      summary: Add a walk-up registration (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalkupInput"
+      responses:
+        "201":
+          description: Created walk-up registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Cap full
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /caps:
+    get:
+      operationId: getCaps
+      tags: [admin]
+      summary: Get event caps (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventSettings"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateCaps
+      tags: [admin]
+      summary: Update event caps (admin)
+      parameters:
+        - name: x-admin-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventSettingsInput"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventSettings"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +355,209 @@ components:
       required:
         - status
 
+    RegistrationInput:
+      type: object
+      required: [full_name, gender, phone, instagram_handle]
+      properties:
+        full_name:
+          type: string
+          minLength: 2
+        gender:
+          type: string
+          enum: [female, male]
+        phone:
+          type: string
+          minLength: 7
+        instagram_handle:
+          type: string
+        website:
+          type: string
+          description: Honeypot field
+
+    RegistrationResult:
+      type: object
+      required: [registration, waitlisted]
+      properties:
+        registration:
+          $ref: "#/components/schemas/Registration"
+        waitlisted:
+          type: boolean
+
+    Registration:
+      type: object
+      required:
+        - id
+        - full_name
+        - gender
+        - phone
+        - instagram_handle
+        - status
+        - payment_status
+        - notes
+        - ticket_token
+        - checked_in
+        - created_at
+      properties:
+        id:
+          type: string
+        full_name:
+          type: string
+        gender:
+          type: string
+          enum: [female, male]
+        phone:
+          type: string
+        instagram_handle:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected, waitlist]
+        payment_status:
+          type: string
+          enum: [unpaid, pending, paid]
+        payment_method:
+          type: ["string", "null"]
+          enum: [cash, ecocash, null]
+        notes:
+          type: string
+        ticket_token:
+          type: string
+        checked_in:
+          type: boolean
+        checked_in_at:
+          type: ["string", "null"]
+        created_at:
+          type: string
+
+    RegistrationUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, approved, rejected, waitlist]
+        payment_status:
+          type: string
+          enum: [unpaid, pending, paid]
+        payment_method:
+          type: string
+          enum: [cash, ecocash]
+        notes:
+          type: string
+        checked_in:
+          type: boolean
+
+    Stats:
+      type: object
+      required:
+        - femaleCount
+        - maleCount
+        - totalCount
+        - maxFemale
+        - maxMale
+        - maxTotal
+        - femaleSpotsLeft
+        - maleSpotsLeft
+        - totalSpotsLeft
+        - femaleFull
+        - maleFull
+        - isFull
+        - femaleWaitlistCount
+        - maleWaitlistCount
+        - checkedInCount
+        - paidCount
+      properties:
+        femaleCount:
+          type: integer
+        maleCount:
+          type: integer
+        totalCount:
+          type: integer
+        maxFemale:
+          type: integer
+        maxMale:
+          type: integer
+        maxTotal:
+          type: integer
+        femaleSpotsLeft:
+          type: integer
+        maleSpotsLeft:
+          type: integer
+        totalSpotsLeft:
+          type: integer
+        femaleFull:
+          type: boolean
+        maleFull:
+          type: boolean
+        isFull:
+          type: boolean
+        femaleWaitlistCount:
+          type: integer
+        maleWaitlistCount:
+          type: integer
+        checkedInCount:
+          type: integer
+        paidCount:
+          type: integer
+
+    TicketLookupInput:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+
+    CheckinInput:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        collect_cash:
+          type: boolean
+
+    WalkupInput:
+      type: object
+      required: [full_name, gender]
+      properties:
+        full_name:
+          type: string
+          minLength: 2
+        gender:
+          type: string
+          enum: [female, male]
+
+    EventSettings:
+      type: object
+      required: [id, max_total, max_female, max_male, updated_at]
+      properties:
+        id:
+          type: integer
+        max_total:
+          type: integer
+        max_female:
+          type: integer
+        max_male:
+          type: integer
+        updated_at:
+          type: string
+
+    EventSettingsInput:
+      type: object
+      required: [max_total, max_female, max_male]
+      properties:
+        max_total:
+          type: integer
+          minimum: 0
+        max_female:
+          type: integer
+          minimum: 0
+        max_male:
+          type: integer
+          minimum: 0
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
