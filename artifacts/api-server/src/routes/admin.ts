@@ -16,6 +16,14 @@ function requireAdmin(req: import("express").Request, res: import("express").Res
   return true;
 }
 
+router.post("/admin/login", (req, res) => {
+  const { password } = req.body as { password?: string };
+  if (password && password === ADMIN_PASSWORD) {
+    return res.json({ ok: true });
+  }
+  return res.status(401).json({ error: "Unauthorized" });
+});
+
 router.get("/registrations", async (req, res) => {
   if (!requireAdmin(req, res)) return;
   const rows = await db

@@ -1728,40 +1728,48 @@ export default function AdminDashboard() {
   );
   const [inputPw, setInputPw] = useState("");
   const [authError, setAuthError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
   const [tab, setTab] = useState<"list" | "door">("list");
   const prevCountRef = useRef(0);
 
   const {
     data: registrations = [],
     isLoading,
-    isError,
   } = useGetRegistrations(undefined, {
     query: {
-      queryKey: getGetRegistrationsQueryKey(),
+      queryKey: [...getGetRegistrationsQueryKey(), pw],
       enabled: !!pw,
       refetchInterval: 10000,
+      retry: false,
     },
     request: { headers: { "x-admin-password": pw } },
   });
-
-  // Detect auth failure
-  useEffect(() => {
-    if (isError && pw) {
-      sessionStorage.removeItem("jamcritty.adminpw");
-      setPw("");
-      setAuthError("Incorrect password.");
-    }
-  }, [isError, pw]);
 
   useEffect(() => {
     prevCountRef.current = registrations.length;
   }, [registrations.length]);
 
-  function login() {
+  async function login() {
     setAuthError("");
-    sessionStorage.setItem("jamcritty.adminpw", inputPw);
-    setPw(inputPw);
-    setInputPw("");
+    setLoggingIn(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: inputPw }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem("jamcritty.adminpw", inputPw);
+        setPw(inputPw);
+        setInputPw("");
+      } else {
+        setAuthError("Incorrect password. Try again.");
+      }
+    } catch {
+      setAuthError("Could not reach the server. Try again.");
+    } finally {
+      setLoggingIn(false);
+    }
   }
 
   if (!pw) {
@@ -1793,7 +1801,8 @@ export default function AdminDashboard() {
               border: `2px solid ${authError ? "rgba(255,61,139,0.5)" : "rgba(255,255,255,0.1)"}`,
               fontFamily: "Inter, sans-serif",
             }}
-            onKeyDown={(e) => e.key === "Enter" && login()}
+            disabled={loggingIn}
+            onKeyDown={(e) => e.key === "Enter" && !loggingIn && login()}
             onFocus={(e) => (e.target.style.borderColor = "#FF3D8B")}
             onBlur={(e) =>
               (e.target.style.borderColor = authError
@@ -1806,8 +1815,8 @@ export default function AdminDashboard() {
               {authError}
             </p>
           )}
-          <button onClick={login} className="btn-primary w-full py-4">
-            ENTER
+          <button onClick={login} disabled={loggingIn} className="btn-primary w-full py-4" style={{ opacity: loggingIn ? 0.6 : 1 }}>
+            {loggingIn ? "CHECKING..." : "ENTER"}
           </button>
         </div>
       </div>
