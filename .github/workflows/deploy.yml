@@ -26,10 +26,16 @@ jobs:
         env:
           VITE_API_URL: https://jam-critty-api.onrender.com
 
-      - name: Deploy to Netlify
+      - name: Deploy to Netlify (zip deploy)
         run: |
-          npm install -g netlify-cli
-          netlify deploy --prod \
-            --dir=artifacts/jam-critty/dist/public \
-            --site=${{ secrets.NETLIFY_SITE_ID }} \
-            --auth=${{ secrets.NETLIFY_AUTH_TOKEN }}
+          cd artifacts/jam-critty/dist/public
+          zip -r /tmp/deploy.zip .
+          curl -X POST "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID/deploys" \
+            -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            -H "Content-Type: application/zip" \
+            --data-binary @/tmp/deploy.zip \
+            -o /tmp/deploy-result.json
+          cat /tmp/deploy-result.json | python3 -c "import sys,json; d=json.load(sys.stdin); print('Deploy URL:', d.get('ssl_url') or d.get('deploy_ssl_url') or d.get('url')); print('State:', d.get('state'))"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
