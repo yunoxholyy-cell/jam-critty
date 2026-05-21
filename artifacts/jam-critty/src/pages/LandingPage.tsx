@@ -805,61 +805,6 @@ export default function LandingPage() {
             vibes.
           </p>
 
-          {/* Spots */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-            <div className="card-surface p-6 text-center">
-              <p className="font-mono-micro mb-2" style={{ opacity: 0.6 }}>
-                WOMEN SPOTS LEFT
-              </p>
-              <p
-                className="font-display"
-                style={{ fontSize: "3rem", color: "#FF3D8B" }}
-              >
-                {stats?.femaleSpotsLeft ?? "—"}
-              </p>
-              <p className="font-mono-micro mt-1" style={{ opacity: 0.4 }}>
-                / {stats?.maxFemale ?? 34}
-              </p>
-            </div>
-            <div className="card-surface p-6 text-center">
-              <p className="font-mono-micro mb-2" style={{ opacity: 0.6 }}>
-                MEN SPOTS LEFT
-              </p>
-              <p
-                className="font-display"
-                style={{ fontSize: "3rem", color: "#00D4FF" }}
-              >
-                {stats?.maleSpotsLeft ?? "—"}
-              </p>
-              <p className="font-mono-micro mt-1" style={{ opacity: 0.4 }}>
-                / {stats?.maxMale ?? 16}
-              </p>
-            </div>
-            <div className="card-surface p-6 text-center">
-              <p className="font-mono-micro mb-2" style={{ opacity: 0.6 }}>
-                TOTAL FILLED
-              </p>
-              <p
-                className="font-display"
-                style={{ fontSize: "3rem", color: "#FFD23F" }}
-              >
-                {stats
-                  ? stats.maxTotal - stats.totalSpotsLeft
-                  : "—"}
-              </p>
-              <p className="font-mono-micro mt-1" style={{ opacity: 0.4 }}>
-                / {stats?.maxTotal ?? 50}
-              </p>
-            </div>
-          </div>
-          {isFull && (
-            <div
-              className="font-mono-micro px-4 py-2 rounded-full inline-block mb-6"
-              style={{ background: "#B8FF3F", color: "#1A0B2E" }}
-            >
-              WAITLIST OPEN
-            </div>
-          )}
 
           {/* Form or success */}
           <div className="card-surface p-8 md:p-10">
