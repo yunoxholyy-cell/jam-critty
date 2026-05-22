@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   useGetRegistrations,
   useUpdateRegistration,
@@ -1727,6 +1728,7 @@ export default function AdminDashboard() {
     () => sessionStorage.getItem("jamcritty.adminpw") ?? "",
   );
   const [inputPw, setInputPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [authError, setAuthError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
   const [tab, setTab] = useState<"list" | "door">("list");
@@ -1790,26 +1792,37 @@ export default function AdminDashboard() {
               ADMIN ACCESS ONLY
             </p>
           </div>
-          <input
-            type="password"
-            value={inputPw}
-            onChange={(e) => setInputPw(e.target.value)}
-            placeholder="Password..."
-            className="w-full rounded-xl px-4 py-4 text-white outline-none mb-4"
-            style={{
-              background: "rgba(0,0,0,0.3)",
-              border: `2px solid ${authError ? "rgba(255,61,139,0.5)" : "rgba(255,255,255,0.1)"}`,
-              fontFamily: "Inter, sans-serif",
-            }}
-            disabled={loggingIn}
-            onKeyDown={(e) => e.key === "Enter" && !loggingIn && login()}
-            onFocus={(e) => (e.target.style.borderColor = "#FF3D8B")}
-            onBlur={(e) =>
-              (e.target.style.borderColor = authError
-                ? "rgba(255,61,139,0.5)"
-                : "rgba(255,255,255,0.1)")
-            }
-          />
+          <div className="relative mb-4">
+            <input
+              type={showPw ? "text" : "password"}
+              value={inputPw}
+              onChange={(e) => setInputPw(e.target.value)}
+              placeholder="Password..."
+              className="w-full rounded-xl px-4 py-4 pr-12 text-white outline-none"
+              style={{
+                background: "rgba(0,0,0,0.3)",
+                border: `2px solid ${authError ? "rgba(255,61,139,0.5)" : "rgba(255,255,255,0.1)"}`,
+                fontFamily: "Inter, sans-serif",
+              }}
+              disabled={loggingIn}
+              onKeyDown={(e) => e.key === "Enter" && !loggingIn && login()}
+              onFocus={(e) => (e.target.style.borderColor = "#FF3D8B")}
+              onBlur={(e) =>
+                (e.target.style.borderColor = authError
+                  ? "rgba(255,61,139,0.5)"
+                  : "rgba(255,255,255,0.1)")
+              }
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+              tabIndex={-1}
+            >
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           {authError && (
             <p className="font-mono-micro mb-4" style={{ color: "#FF3D8B" }}>
               {authError}
