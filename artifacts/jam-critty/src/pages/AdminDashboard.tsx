@@ -1755,7 +1755,8 @@ export default function AdminDashboard() {
     setAuthError("");
     setLoggingIn(true);
     try {
-      const res = await fetch("/api/admin/login", {
+      const base = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+      const res = await fetch(`${base}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: inputPw }),
