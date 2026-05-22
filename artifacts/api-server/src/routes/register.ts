@@ -20,10 +20,6 @@ function checkRateLimit(ip: string): boolean {
 }
 
 router.post("/register", async (req, res) => {
-  try { await (await import("@workspace/db")).pool.query("SELECT 1"); } catch (e) {
-    const cause = (e as { cause?: { message?: string } })?.cause?.message || (e as Error).message;
-    return res.status(500).json({ error: `DB connection failed: ${cause}` });
-  }
   const ip =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
     req.socket.remoteAddress ||
@@ -51,7 +47,7 @@ router.post("/register", async (req, res) => {
   if (!gender || !["female", "male"].includes(gender)) {
     return res.status(400).json({ error: "Please select a gender." });
   }
-  if (!phone || phone.trim().length < 7) {
+  if (!phone || phone.trim().length < 6) {
     return res.status(400).json({ error: "Please enter a valid phone number." });
   }
   if (!instagram_handle || instagram_handle.trim().length === 0) {
