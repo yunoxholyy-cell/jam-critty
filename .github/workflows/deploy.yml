@@ -67,9 +67,10 @@ jobs:
 
           git add -A
           git commit -m "Deploy: built API $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/yunoxholyy-cell/jam-critty.git
           git push origin HEAD:render-deploy --force
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
 
       - name: Trigger Render deploy
         run: |
