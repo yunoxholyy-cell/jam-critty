@@ -50,18 +50,20 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          # Switch to (or create) render-deploy branch
-          git checkout --orphan render-deploy-tmp
-          git reset --hard
-
-          # Copy only what Render needs to run the server
-          cp -r artifacts/api-server/dist ./dist
-          cp artifacts/api-server/package.json ./package.json
-
-          # Minimal package.json for Render (just the start command)
-          cat > package.json << 'EOF'
+          # Stash built output BEFORE switching branches
+          cp -r artifacts/api-server/dist /tmp/api-dist
+          cat > /tmp/api-package.json << 'EOF'
           {"name":"jam-critty-api","version":"1.0.0","type":"module","scripts":{"start":"node --enable-source-maps dist/index.mjs"}}
           EOF
+
+          # Orphan branch — completely empty history
+          git checkout --orphan render-deploy-tmp
+          git reset --hard
+          rm -rf ./*  2>/dev/null || true
+
+          # Copy built files from temp
+          cp -r /tmp/api-dist ./dist
+          cp /tmp/api-package.json ./package.json
 
           git add -A
           git commit -m "Deploy: built API $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
