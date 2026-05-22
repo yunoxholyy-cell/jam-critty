@@ -885,14 +885,14 @@ function ListMode({
   ).length;
 
   const statTiles = [
-    { label: "CONFIRMED", value: approved, color: "#00D4FF" },
-    { label: "PENDING", value: pending, color: "#FFD23F" },
-    { label: "WAITLIST", value: waitlist, color: "#B8FF3F" },
-    { label: "REJECTED", value: rejected, color: "#FF3D8B" },
-    { label: "WOMEN IN", value: womenConfirmed, color: "#FF3D8B" },
-    { label: "MEN IN", value: menConfirmed, color: "#00D4FF" },
-    { label: "PAID", value: paid, color: "#B8FF3F" },
-    { label: "UNPAID", value: unpaid, color: "#FFD23F" },
+    { label: "CONFIRMED", value: approved, color: "#00D4FF", action: () => { setStatusFilter("APPROVED"); setPayFilter("ANY"); } },
+    { label: "PENDING", value: pending, color: "#FFD23F", action: () => { setStatusFilter("PENDING"); setPayFilter("ANY"); } },
+    { label: "WAITLIST", value: waitlist, color: "#B8FF3F", action: () => { setStatusFilter("WAITLIST"); setPayFilter("ANY"); } },
+    { label: "REJECTED", value: rejected, color: "#FF3D8B", action: () => { setStatusFilter("REJECTED"); setPayFilter("ANY"); } },
+    { label: "WOMEN IN", value: womenConfirmed, color: "#FF3D8B", action: () => { setStatusFilter("APPROVED"); setPayFilter("ANY"); } },
+    { label: "MEN IN", value: menConfirmed, color: "#00D4FF", action: () => { setStatusFilter("APPROVED"); setPayFilter("ANY"); } },
+    { label: "PAID", value: paid, color: "#B8FF3F", action: () => { setStatusFilter("ALL"); setPayFilter("PAID"); } },
+    { label: "UNPAID", value: unpaid, color: "#FFD23F", action: () => { setStatusFilter("ALL"); setPayFilter("UNPAID"); } },
   ];
 
   // Filter
@@ -958,14 +958,19 @@ function ListMode({
       {/* Stat tiles */}
       <div className="grid grid-cols-4 md:grid-cols-8 gap-3 mb-6">
         {statTiles.map((t) => (
-          <div key={t.label} className="card-surface p-3 text-center" style={{ borderRadius: "1rem" }}>
+          <button
+            key={t.label}
+            onClick={t.action}
+            className="card-surface p-3 text-center transition-all hover:scale-105 active:scale-95"
+            style={{ borderRadius: "1rem", cursor: "pointer" }}
+          >
             <p className="font-display text-2xl" style={{ color: t.color }}>
               {t.value}
             </p>
             <p className="font-mono-micro mt-1" style={{ opacity: 0.5, fontSize: 8 }}>
               {t.label}
             </p>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -1737,13 +1742,15 @@ export default function AdminDashboard() {
   const {
     data: registrations = [],
     isLoading,
+    isError,
+    refetch,
   } = useGetRegistrations(undefined, {
     query: {
       queryKey: [...getGetRegistrationsQueryKey(), pw],
       enabled: !!pw,
-      refetchInterval: 10000,
-      retry: 3,
-      retryDelay: 5000,
+      refetchInterval: 15000,
+      retry: 4,
+      retryDelay: (attempt) => Math.min(attempt * 15000, 60000),
     },
     request: { headers: { "x-admin-password": pw } },
   });
@@ -1893,12 +1900,21 @@ export default function AdminDashboard() {
         </div>
       </header>
 
+      {isError && (
+        <div className="mx-6 mb-4 rounded-xl p-4 flex items-center justify-between"
+          style={{ background: "rgba(255,61,139,0.15)", border: "1px solid rgba(255,61,139,0.4)" }}>
+          <p className="font-mono-micro text-sm" style={{ color: "#FF3D8B" }}>
+            SERVER WAKING UP — RETRYING...
+          </p>
+          <button onClick={() => refetch()} className="font-mono-micro px-4 py-2 rounded-full"
+            style={{ background: "#FF3D8B", color: "#FFF8F0", fontSize: 10 }}>
+            REFRESH NOW
+          </button>
+        </div>
+      )}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <p
-            className="font-mono-micro animate-pulse"
-            style={{ color: "#FF3D8B" }}
-          >
+          <p className="font-mono-micro animate-pulse" style={{ color: "#FF3D8B" }}>
             LOADING REGISTRATIONS...
           </p>
         </div>
