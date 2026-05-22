@@ -99,7 +99,7 @@ router.post("/register", async (req, res) => {
   const maleCount = Number(maleRow?.c ?? 0);
   const totalCount = femaleCount + maleCount;
 
-  let status: "approved" | "waitlist";
+  let status: "pending" | "waitlist";
   if (totalCount >= caps.max_total) {
     status = "waitlist";
   } else if (gender === "female" && femaleCount >= caps.max_female) {
@@ -107,7 +107,7 @@ router.post("/register", async (req, res) => {
   } else if (gender === "male" && maleCount >= caps.max_male) {
     status = "waitlist";
   } else {
-    status = "approved";
+    status = "pending";
   }
 
   const [registration] = await db

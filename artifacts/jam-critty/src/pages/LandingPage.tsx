@@ -872,12 +872,11 @@ export default function LandingPage() {
                     className="font-display mb-2"
                     style={{ fontSize: "2.5rem", color: "#FFF8F0" }}
                   >
-                    YOU'RE{" "}
-                    <span className="rainbow-text">IN</span>
+                    REQUEST{" "}
+                    <span className="rainbow-text">RECEIVED</span>
                   </h3>
                   <p className="mb-8" style={{ color: "rgba(255,248,240,0.7)" }}>
-                    {firstName ? `${firstName}, y` : "Y"}ou're locked in for JAM CRITTY. Keep an eye
-                    on WhatsApp — we'll be in touch.
+                    {firstName ? `${firstName}, w` : "W"}e've got your details. Once confirmed by admin, you'll be contacted on WhatsApp with payment info and the address 48 hours before the event.
                   </p>
                   <div className="flex flex-col gap-4 max-w-sm mx-auto">
                     <button

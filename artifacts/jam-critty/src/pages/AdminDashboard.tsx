@@ -1742,7 +1742,8 @@ export default function AdminDashboard() {
       queryKey: [...getGetRegistrationsQueryKey(), pw],
       enabled: !!pw,
       refetchInterval: 10000,
-      retry: false,
+      retry: 3,
+      retryDelay: 5000,
     },
     request: { headers: { "x-admin-password": pw } },
   });
