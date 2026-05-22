@@ -44,7 +44,9 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   const status = (err as { status?: number; statusCode?: number }).status
     ?? (err as { status?: number; statusCode?: number }).statusCode
     ?? 500;
-  res.status(status).json({ error: err.message || "Internal server error" });
+  const cause = (err as { cause?: Error }).cause;
+  const msg = cause?.message || err.message || "Internal server error";
+  res.status(status).json({ error: msg });
 });
 
 export default app;
