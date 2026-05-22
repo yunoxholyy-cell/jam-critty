@@ -67,8 +67,7 @@ jobs:
 
           git add -A
           git commit -m "Deploy: built API $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/yunoxholyy-cell/jam-critty.git
-          git push origin HEAD:render-deploy --force
+          git push "https://x-access-token:$GH_PAT@github.com/yunoxholyy-cell/jam-critty.git" HEAD:render-deploy --force
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
