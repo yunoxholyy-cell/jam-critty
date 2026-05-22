@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -67,12 +69,7 @@ jobs:
 
           git add -A
           git commit -m "Deploy: built API $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          # Override the GITHUB_TOKEN header that actions/checkout injected
-          git -c http.extraheader="" push \
-            "https://yunoxholyy-cell:$GH_PAT@github.com/yunoxholyy-cell/jam-critty.git" \
-            HEAD:render-deploy --force
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          git push origin HEAD:render-deploy --force
 
       - name: Trigger Render deploy
         run: |
