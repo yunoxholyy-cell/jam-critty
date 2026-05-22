@@ -67,9 +67,10 @@ jobs:
 
           git add -A
           git commit -m "Deploy: built API $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          # Clear the GITHUB_TOKEN auth header that actions/checkout injected
-          git config --global --unset-all http.https://github.com/.extraheader || true
-          git push "https://yunoxholyy-cell:$GH_PAT@github.com/yunoxholyy-cell/jam-critty.git" HEAD:render-deploy --force
+          # Override the GITHUB_TOKEN header that actions/checkout injected
+          git -c http.extraheader="" push \
+            "https://yunoxholyy-cell:$GH_PAT@github.com/yunoxholyy-cell/jam-critty.git" \
+            HEAD:render-deploy --force
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
