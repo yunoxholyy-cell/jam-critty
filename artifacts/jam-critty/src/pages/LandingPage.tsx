@@ -267,7 +267,7 @@ function downloadICS() {
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
   gender: z.enum(["female", "male"], { error: "Please select a gender" }),
-  phone: z.string().min(7, "Please enter a valid phone number"),
+  phone: z.string().min(6, "Please enter your phone number"),
   instagram_handle: z.string().min(1, "Instagram handle is required"),
   website: z.string().optional(),
 });
@@ -996,7 +996,7 @@ export default function LandingPage() {
                   </label>
                   <input
                     type="tel"
-                    placeholder="+263 77 ..."
+                    placeholder="077 648 2053"
                     {...form.register("phone")}
                     className="w-full rounded-xl px-4 py-4 text-white outline-none transition-all"
                     style={{
@@ -1054,8 +1054,18 @@ export default function LandingPage() {
                     className="rounded-xl p-4 text-sm"
                     style={{ background: "rgba(255,61,139,0.15)", border: "1px solid rgba(255,61,139,0.4)", color: "#FFF8F0" }}
                   >
-                    {(registerMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                      "Something went wrong. Please try again."}
+                    {(() => {
+                      const err = registerMutation.error as { data?: { error?: string }; message?: string } | null;
+                      const serverMsg = err?.data?.error;
+                      if (serverMsg) return serverMsg;
+                      const msg = err?.message ?? "";
+                      if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("Load failed")) {
+                        return "Unable to connect to the server. Please check your connection and try again.";
+                      }
+                      if (msg.includes("429")) return "Too many attempts. Please wait a minute and try again.";
+                      if (msg) return msg.replace(/^HTTP \d+ \w+:\s*/i, "");
+                      return "Something went wrong. Please try again.";
+                    })()}
                   </div>
                 )}
 
