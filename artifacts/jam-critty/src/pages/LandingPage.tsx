@@ -438,7 +438,7 @@ export default function LandingPage() {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              src="/poster.jpg"
+              src="/.netlify/images?url=/poster.jpg&w=900&q=80&fm=webp"
               alt="Event Poster"
               className="max-h-full max-w-full object-contain"
               style={{ borderRadius: "1.75rem" }}
@@ -471,9 +471,11 @@ export default function LandingPage() {
         <section className="min-h-[100svh] flex flex-col justify-center p-6 relative">
           <div className="absolute inset-0 overflow-hidden" style={{ zIndex: -1 }}>
             <img
-              src="/hero.jpg"
+              src="/.netlify/images?url=/hero.jpg&w=1600&q=75&fm=webp"
               alt=""
               className="w-full h-full object-cover"
+              fetchPriority="high"
+              decoding="sync"
             />
             <div
               className="absolute inset-0"
@@ -645,9 +647,11 @@ export default function LandingPage() {
               >
                 <div className="absolute inset-0 z-0">
                   <img
-                    src={card.img}
+                    src={`/.netlify/images?url=${card.img}&w=800&q=75&fm=webp`}
                     alt=""
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div
                     className="absolute inset-0"
@@ -704,9 +708,11 @@ export default function LandingPage() {
                 }}
               >
                 <img
-                  src="/poster.jpg"
+                  src="/.netlify/images?url=/poster.jpg&w=600&q=80&fm=webp"
                   alt="Event Poster"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div
                   className="absolute bottom-4 right-4 font-mono-micro px-4 py-2 rounded-full flex items-center gap-2"
@@ -742,9 +748,11 @@ export default function LandingPage() {
           style={{ height: "clamp(280px,30vw,380px)" }}
         >
           <img
-            src="/break-pool.jpg"
+            src="/.netlify/images?url=/break-pool.jpg&w=1400&q=75&fm=webp"
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
           <div
             className="absolute inset-0"
